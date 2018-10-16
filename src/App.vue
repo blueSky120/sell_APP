@@ -3,11 +3,11 @@
     <Header :seller="seller"></Header>
     <div class="tab border-1px">
       <router-link class="tab-item"
-                   to="/goods">商品</router-link>
+                   to="/goods">商品1</router-link>
       <router-link class="tab-item"
-                   to="/ratings">评论</router-link>
+                   to="/ratings">评论1</router-link>
       <router-link class="tab-item"
-                   to="/seller">商家</router-link>
+                   to="/seller">商家1</router-link>
       <!-- <div class="tab-item">商品</div>
       <div class="tab-item">评论</div>
       <div class="tab-item">商家</div> -->
