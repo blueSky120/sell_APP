@@ -1,8 +1,6 @@
 <template>
   <div class="star"
        :class="starType">
-    <!-- <span v-for="itemClass in itemClasses"
-          :class="itemClass"></span> -->
     <span class="star-item"
           v-for="(itemClass,index) in itemClasses"
           :class="itemClass"
