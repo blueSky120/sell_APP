@@ -1,10 +1,13 @@
 <template>
   <div class="goods">
-    <div class="menu-wrapper">
+    <div class="menu-wrapper"
+         ref="menuWrapper">
       <ul>
         <li class="menu-item"
             v-for="(item,index) in goods"
-            :key="index">
+            :class="{'current':currentIndex==index}"
+            :key="index"
+            @click="selectMenu(index,$event)">
           <span class="text border-1px">
             <span class="icon"
                   :class="classMap[item.type]"
@@ -15,9 +18,10 @@
         </li>
       </ul>
     </div>
-    <div class="foods-wrapper">
+    <div class="foods-wrapper"
+         ref="foodsWrapper">
       <ul>
-        <li class="food-list"
+        <li class="food-list food-list-hook"
             v-for="(item,index1) in goods"
             :key="index1">
           <h1 class="title">
@@ -28,10 +32,12 @@
                 v-for="(food,index2) in item.foods"
                 :key="index2">
               <div class="icon">
-                <img :src="food.icon"
+                <img width="57"
+                     height="57"
+                     :src="food.icon"
                      alt="">
               </div>
-              <div>
+              <div class="content">
                 <h2 class="name">
                   {{food.name}}
                 </h2>
@@ -39,12 +45,14 @@
                   {{food.description}}
                 </p>
                 <div class="extra">
-                  <span>月售{{food.sellCount}}份</span>
-                  <span>好评率{{food.rating}}%</span>
+                  <span class="count">月售{{food.sellCount}}份</span><span>好评率{{food.rating}}%</span>
                 </div>
                 <div class="price">
-                  <span>￥{{food.price}}</span>
-                  <span v-show="food.oldPrice">￥{{food.oldPrice}}</span>
+                  <span class="now">￥{{food.price}}</span><span class="old"
+                        v-show="food.oldPrice">￥{{food.oldPrice}}</span>
+                </div>
+                <div class="cartcontrol-wrapper">
+                  <Cartcontrol :food="food" />
                 </div>
               </div>
             </li>
@@ -52,11 +60,19 @@
         </li>
       </ul>
     </div>
+    <Shopcart :delivery-price="seller.deliveryPrice"
+              :min-price="seller.minPrice"
+              :selectFoods="selectFoods" />
   </div>
 </template>
 
 <script>
+
+import BScroll from 'better-scroll'
+import Shopcart from './../shopcart/Shopcart'
+import Cartcontrol from './../cartcontrol/Cartcontrol'
 const ERR_OK = 0
+
 export default {
   props: {
     seller: {
@@ -65,7 +81,32 @@ export default {
   },
   data () {
     return {
-      goods: []
+      goods: [],
+      listHeight: [],
+      scrollY: 0
+    }
+  },
+  computed: {
+    currentIndex () {
+      for (let i = 0; i < this.listHeight.length; i++) {
+        let height1 = this.listHeight[i]
+        let height2 = this.listHeight[i + 1]
+        if (!height2 || (this.scrollY >= height1 && this.scrollY < height2)) {
+          return i
+        }
+      }
+      return 0
+    },
+    selectFoods () {
+      let foods = []
+      this.goods.forEach((good) => {
+        good.foods.forEach((food) => {
+          if (food.count > 0) {
+            foods.push(food)
+          }
+        })
+      })
+      return foods
     }
   },
   created () {
@@ -73,8 +114,49 @@ export default {
     this.$http.get('/api/goods').then((response) => {
       if (response.body.errno === ERR_OK) {
         this.goods = response.body.data
+        this.$nextTick(() => {
+          this._initScroll()
+          this._calculateHeight()
+        })
       }
     })
+  },
+  methods: {
+    _initScroll () {
+      this.menuScroll = new BScroll(this.$refs.menuWrapper, {
+        click: true
+      })
+      this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+        probeType: 3,
+        click: true
+      })
+      this.foodsScroll.on('scroll', (pos) => {
+        this.scrollY = Math.abs(Math.round(pos.y))
+      })
+    },
+    _calculateHeight () {
+      let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
+      let height = 0
+      this.listHeight.push(height)
+      for (let i = 0; i < foodList.length; i++) {
+        let item = foodList[i]
+        height += item.clientHeight
+        this.listHeight.push(height)
+      }
+    },
+    selectMenu (index, event) {
+      // BScroll派发事件
+      if (!event._constructed) {
+        return
+      }
+      let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
+      let el = foodList[index]
+      this.foodsScroll.scrollToElement(el, 300)
+    }
+  },
+  components: {
+    Shopcart,
+    Cartcontrol
   }
 }
 </script>
@@ -99,6 +181,14 @@ export default {
       width 56px
       padding 0 12px
       line-height 14px
+      &.current
+        position relative
+        font-weight 700
+        margin-top -1px
+        z-index 10
+        background #fff
+        .text
+          border-none()
       .icon
         display inline-block
         width 12px
@@ -138,6 +228,43 @@ export default {
       display flex
       margin 18px
       border-1px(rgba(7, 17, 27, 0.1))
+      padding-bottom 18px
       &:last-child
-        border-1px(transparent)
+        border-none()
+        margin-bottom 0
+      .icon
+        flex 0 0 57px
+        margin-right 10px
+      .content
+        flex 1
+        .name
+          margin 2px 0 8px 0
+          height 14px
+          line-height 14px
+          color rgb(7, 17, 27)
+        .desc, .extra
+          line-height 10px
+          font-size 10px
+          color rgb(147, 153, 159)
+        .desc
+          margin-bottom 8px
+          line-height 12px
+        .extra
+          .count
+            margin-right 12px
+        .price
+          font-weight 700
+          line-height 24px
+          .now
+            margin-right 18px
+            font-size 14px
+            color rgb(240, 20, 20)
+          .old
+            text-decoration line-through
+            color rgb(147, 153, 159)
+            font-size 10px
+        .cartcontrol-wrapper
+          position absolute
+          right 0
+          bottom 12px
 </style>

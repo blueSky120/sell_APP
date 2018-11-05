@@ -12,3 +12,6 @@ bg-image($url)
   background-image url($url + '@2X.png')
 @media (-webkit-min-device-pixel-ratio: 3), (min-device-pixel-ratio: 3)
   background-image url($url + '@3X.png')
+border-none()
+  &:after
+    display none

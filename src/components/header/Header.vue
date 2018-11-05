@@ -49,8 +49,7 @@
 
       <transition name="fade">
         <div class="detail"
-             v-show="detailShow"
-             transition="fade">
+             v-show="detailShow">
           <div class="detail-wrapper clearfix">
             <div class="detail-main">
               <h1 class="name">

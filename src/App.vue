@@ -12,7 +12,7 @@
       <div class="tab-item">评论</div>
       <div class="tab-item">商家</div> -->
     </div>
-    <router-view></router-view>
+    <router-view :seller="seller"></router-view>
   </div>
 </template>
 
@@ -46,6 +46,7 @@ export default {
 
 <style lang="stylus" rel="stylesheet/stylus">
 @import './common/stylus/mixin.styl'
+
 #app
   .tab
     display flex
