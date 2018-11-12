@@ -24,7 +24,7 @@
           </div>
         </div>
         <div class="content-right"
-             @click="pay">
+             @click.stop="pay">
           <div class="pay"
                :class="payClass">
             {{payDesc}}
@@ -42,7 +42,7 @@
           <div class="list-content"
                ref="listContent">
             <ul>
-              <li class="food"
+              <li class="food border-1px"
                   v-for="(food,index) in selectFoods"
                   :key="index">
                 <span class="name">{{food.name}}</span>
@@ -99,21 +99,20 @@ export default {
   computed: {
     listShow () {
       if (!this.totalCount) {
-        this.fold = true
+        // this.fold = true
         return false
       }
       let show = !this.fold
       if (show) {
-        if (!this.scroll) {
-          this.$nextTick(() => {
-            this.scroll = new BScroll(this.$refs.listContent, {
-              click: true
-            })
-          })
-        } else {
-          console.log('this.scroll', this.scroll)
-          this.scroll.refresh()
-        }
+        this.$nextTick(() => {
+          if (!this.scroll) {
+            // this.scroll = new BScroll(this.$refs.listContent, {
+            //   click: true
+            // })
+          } else {
+            this.scroll.refresh()
+          }
+        })
       }
       return show
     },
@@ -149,8 +148,28 @@ export default {
       }
     }
   },
+  watch: {
+    totalCount (newQuestion, oldQuestion) {
+      if (!newQuestion) {
+        this.fold = true
+      }
+    },
+    fold (newQuestion) {
+      let show = !newQuestion
+      if (show) {
+        this.$nextTick(() => {
+          if (!this.scroll) {
+            this.scroll = new BScroll(this.$refs.listContent, {
+              click: true
+            })
+          }
+        })
+      }
+    }
+  },
   methods: {
     pay () {
+      console.log(1111111111)
       if (this.totalPrice < this.minPrice) {
         return false
       }
