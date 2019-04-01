@@ -321,7 +321,7 @@ export default {
         .cartcontrol-wrapper {
           position: absolute;
           right: 0;
-          bottom: 12px;
+          bottom: 13px;
         }
       }
     }
