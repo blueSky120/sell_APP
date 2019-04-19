@@ -12,7 +12,7 @@
           <div class="title">
             <span class="brand"></span>
             <span class="name">
-              {{seller.name}}
+              {{seller.name}}11
             </span>
           </div>
           <div class="description">
