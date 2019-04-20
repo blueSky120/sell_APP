@@ -42,7 +42,7 @@
               </div>
               <div class="content">
                 <h2 class="name">
-                  {{ food.name }} 测试111
+                  {{ food.name }} 测试222
                 </h2>
                 <p class="desc">
                   {{ food.description }}
